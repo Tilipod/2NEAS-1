@@ -1,0 +1,18 @@
+[submodule "2NEAS-1-api"]
+	path = 2NEAS-1-api
+	url = https://github.com/Tilipod/2NEAS-1-api.git
+[submodule "2NEAS-1-scheduler"]
+	path = 2NEAS-1-scheduler
+	url = https://github.com/Tilipod/2NEAS-1-scheduler.git
+[submodule "2NEAS-1-parser"]
+	path = 2NEAS-1-parser
+	url = https://github.com/Tilipod/2NEAS-1-parser.git
+[submodule "2NEAS-1-distributor"]
+	path = 2NEAS-1-distributor
+	url = https://github.com/Tilipod/2NEAS-1-distributor.git
+[submodule "2NEAS-1-teacher"]
+	path = 2NEAS-1-teacher
+	url = https://github.com/Tilipod/2NEAS-1-teacher.git
+[submodule "2NEAS-1-mentor"]
+	path = 2NEAS-1-mentor
+	url = https://github.com/Tilipod/2NEAS-1-mentor.git
