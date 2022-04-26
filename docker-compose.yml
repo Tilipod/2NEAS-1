@@ -1,0 +1,155 @@
+version: '3.5'
+
+services: 
+  2neas-1-eureka:
+    container_name: 2neas-1-eureka
+    image: 2neas-1-eureka:0.0.1
+    volumes:
+       - 2neas-1-eureka:/data/2neas-1-eureka
+    ports:
+      - "50001:50001"
+    networks:
+      - 2neas-1
+
+  2neas-1-postgres:
+    container_name: 2neas-1-postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "2neas-1"
+      PGDATA: /data/postgres/2neas-1
+    volumes:
+       - 2neas-1-postgres:/data/postgres/2neas-1-postgres
+    ports:
+      - "55010:5432"
+    networks:
+      - 2neas-1
+
+  2neas-1-pgadmin:
+    container_name: 2neas-1-pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    volumes:
+       - 2neas-1-pgadmin:/root/.pgadmin
+    ports:
+      - "${PGADMIN_PORT:-55011}:80"
+    networks:
+      - 2neas-1
+
+  2neas-1-api:
+    container_name: 2neas-1-api
+    image: 2neas-1-api:0.0.1
+    volumes:
+       - 2neas-1-api:/data/2neas-1-api
+    environment:
+      EUREKA_URI: ${EUREKA_URI:-http://2neas-1-eureka:50001/eureka/}
+    ports:
+      - "50002:50002"
+    networks:
+      - 2neas-1
+
+  2neas-1-rabbitmq:          
+    container_name: 2neas-1-rabbitmq
+    image: 'bitnami/rabbitmq:3.8.5'
+    ports:
+      - '55003:4369'
+      - '55001:5672'
+      - '55004:25672'
+      - '55002:15672'
+    volumes:
+      - 2neas-1-rabbitmq:/2neas-1-rabbitmq
+      - ./rabbitmq-isolated.conf:/etc/rabbitmq/rabbitmq.config
+    environment:
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+      - RABBITMQ_CONFIG_FILE=/etc/rabbitmq/rabbitmq.config
+    networks:
+      - 2neas-1
+
+  2neas-1-teacher:
+    container_name: 2neas-1-teacher
+    image: 2neas-1-teacher:0.0.1
+    volumes:
+       - 2neas-1-teacher:/data/2neas-1-teacher
+       - 2neas-1-models:/2neas-1/models/
+       - 2neas-1-datasets:/2neas-1/datasets/
+    environment:
+      EUREKA_URI: ${EUREKA_URI:-http://2neas-1-eureka:50001/eureka/}
+      RABBITMQ_HOST: ${RABBITMQ_HOST:-2neas-1-rabbitmq}
+      RABBITMQ_PORT: ${RABBITMQ_PORT:-5672}
+    ports:
+      - "50005:50005"
+    networks:
+      - 2neas-1
+
+  2neas-1-parser:
+    container_name: 2neas-1-parser
+    image: 2neas-1-parser:0.0.1
+    volumes:
+       - 2neas-1-parser:/data/2neas-1-parser
+       - 2neas-1-models:/2neas-1/models/
+       - 2neas-1-datasets:/2neas-1/datasets/
+    environment:
+      EUREKA_URI: ${EUREKA_URI:-http://2neas-1-eureka:50001/eureka/}
+      RABBITMQ_HOST: ${RABBITMQ_HOST:-2neas-1-rabbitmq}
+      RABBITMQ_PORT: ${RABBITMQ_PORT:-5672}
+    ports:
+      - "50006:50006"
+    networks:
+      - 2neas-1
+
+  2neas-1-distributor:
+    container_name: 2neas-1-distributor
+    image: 2neas-1-distributor:0.0.1
+    volumes:
+       - 2neas-1-distributor:/data/2neas-1-distributor
+       - 2neas-1-models:/2neas-1/models/
+       - 2neas-1-datasets:/2neas-1/datasets/
+    environment:
+      EUREKA_URI: ${EUREKA_URI:-http://2neas-1-eureka:50001/eureka/}
+      RABBITMQ_HOST: ${RABBITMQ_HOST:-2neas-1-rabbitmq}
+      RABBITMQ_PORT: ${RABBITMQ_PORT:-5672}
+    ports:
+      - "50004:50004"
+    networks:
+      - 2neas-1
+
+  2neas-1-scheduler:
+    container_name: 2neas-1-scheduler
+    image: 2neas-1-scheduler:0.0.1
+    environment:
+      EUREKA_URI: ${EUREKA_URI:-http://2neas-1-eureka:50001/eureka/}
+      COMMON_PATH_TO_DATASET: "/2neas-1/datasets/"
+      COMMON_PATH_TO_MODEL: "/2neas-1/models/"
+      RABBITMQ_HOST: ${RABBITMQ_HOST:-2neas-1-rabbitmq}
+      RABBITMQ_PORT: ${RABBITMQ_PORT:-5672}
+      PG_HOST: ${PG_HOST:-2neas-1-postgres}
+      PG_PORT: ${PG_PORT:-5432}
+    volumes:
+       - 2neas-1-scheduler:/data/2neas-1-scheduler
+       - 2neas-1-models:/2neas-1/models/
+       - 2neas-1-datasets:/2neas-1/datasets/
+    ports:
+      - "50003:50003"
+    networks:
+      - 2neas-1
+
+networks:
+  2neas-1:
+    driver: bridge
+
+volumes:
+    2neas-1-eureka:
+    2neas-1-postgres:
+    2neas-1-api:
+    2neas-1-rabbitmq:
+    2neas-1-teacher:
+    2neas-1-parser:
+    2neas-1-distributor:
+    2neas-1-scheduler:
+    2neas-1-pgadmin:
+    2neas-1-models:
+    2neas-1-datasets:

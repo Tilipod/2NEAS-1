@@ -13,9 +13,6 @@
 [submodule "2NEAS-1-teacher"]
 	path = 2NEAS-1-teacher
 	url = https://github.com/Tilipod/2NEAS-1-teacher.git
-[submodule "2NEAS-1-mentor"]
-	path = 2NEAS-1-mentor
-	url = https://github.com/Tilipod/2NEAS-1-mentor.git
 [submodule "2NEAS-1-eureka"]
 	path = 2NEAS-1-eureka
 	url = https://github.com/Tilipod/2NEAS-1-eureka.git
